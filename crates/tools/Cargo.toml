@@ -1,0 +1,9 @@
+[package]
+name = "tools"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+agent_core = { path = "../agent_core" }
+async-trait = "0.1"
+anyhow = "1"

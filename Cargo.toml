@@ -1,0 +1,9 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/agent_core",
+    "crates/llm-ollama",
+    "crates/obsidian-store",
+    "crates/tools",
+    "crates/app",
+]

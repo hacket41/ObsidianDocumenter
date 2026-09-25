@@ -1,0 +1,12 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+agent_core = { path = "../agent_core" }
+llm-ollama = { path = "../llm-ollama" }
+obsidian-store = { path = "../obsidian-store" }
+tools = { path = "../tools" }
+tokio = { version = "1", features = ["full"] }
+anyhow = "1"
