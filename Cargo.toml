@@ -5,5 +5,5 @@ members = [
     "crates/llm-ollama",
     "crates/obsidian-store",
     "crates/tools",
-    "crates/app",
+    "crates/app", "desktop",
 ]
