@@ -3,6 +3,7 @@ mod graph_view;
 mod state;
 
 use chat_view::ChatView;
+use gpui::prelude::*;
 use gpui::*;
 use graph_view::GraphView;
 use state::AppState;
@@ -26,9 +27,9 @@ fn main() {
     Application::new().run(|cx: &mut App| {
         let state = cx.new(|_| AppState::new());
 
-        cx.open_window(WindowOptions::default(), |window, cx| {
-            let chat = cx.new(|cx| ChatView { state: state.clone() });
-            let graph = cx.new(|cx| GraphView { state: state.clone() });
+        cx.open_window(WindowOptions::default(), |_window, cx| {
+            let chat = cx.new(|_| ChatView { state: state.clone() });
+            let graph = cx.new(|_| GraphView { state: state.clone() });
             cx.new(|_| RootView { chat, graph })
         })
         .unwrap();
