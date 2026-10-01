@@ -8,7 +8,7 @@ agent_core = { path = "../agent_core" }
 llm-ollama = { path = "../llm-ollama" }
 obsidian-store = { path = "../obsidian-store" }
 
-gpui = { git = "https://github.com/zed-industries/zed.git", rev = "main" }
+gpui = { git = "https://github.com/zed-industries/zed.git", rev = "e8c6c67fad693a5b77504ec6f5cc6cc4ec60ee7b" }
 
 tokio = { version = "1", features = ["full"] }
 anyhow = "1"

@@ -95,7 +95,7 @@ impl AppState {
     pub fn step_layout(&mut self) {
         let n = self.graph.nodes.len();
         for i in 0..n {
-            for j (i + 1)..n {
+            for j in (i + 1)..n {
                 let (dx, dy) = {
                     let a = &self.graph.nodes[i];
                     let b = &self.graph.nodes[j];
