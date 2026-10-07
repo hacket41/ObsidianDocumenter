@@ -1,18 +1,34 @@
 mod config;
 mod doc_writer;
 
-use config::AppConfig;
+use config::{AppConfig, APP_ID};
 use gtk::prelude::*;
-use gtk::{glib, Application, ApplicationWindow, Box as GtkBox, Button, FileChooserAction, FileChooserDialog, Label, Orientation, ResponseType, TextView};
+use gtk::{
+    glib, Application, ApplicationWindow, Box as GtkBox, Button, CssProvider,
+    FileChooserAction, FileChooserDialog, Label, Orientation, ResponseType, TextView,
+};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
-use config::APP_ID;
 
 fn main() -> glib::ExitCode {
     let app = Application::builder().application_id(APP_ID).build();
+    app.connect_startup(|_| load_css());
     app.connect_activate(build_ui);
     app.run()
+}
+
+fn load_css() {
+    let provider = CssProvider::new();
+    // Loaded relative to the crate at compile time so the binary is
+    // self-contained; edit style/app.css and rebuild to see changes.
+    provider.load_from_string(include_str!("../style/app.css"));
+
+    gtk::style_context_add_provider_for_display(
+        &gtk::gdk::Display::default().expect("no display available"),
+        &provider,
+        gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+    );
 }
 
 fn build_ui(app: &Application) {
@@ -21,8 +37,8 @@ fn build_ui(app: &Application) {
     let window = ApplicationWindow::builder()
         .application(app)
         .title("Obsidian Agent")
-        .default_width(1200)
-        .default_height(800)
+        .default_width(1280)
+        .default_height(820)
         .build();
 
     if config.vault_path.is_none() {
@@ -37,14 +53,9 @@ fn build_ui(app: &Application) {
     let vault_path = config.vault_path.clone().unwrap_or_else(default_vault_path);
 
     let root = GtkBox::new(Orientation::Horizontal, 0);
-
-    let sidebar = build_sidebar();
-    let center = build_center_pane(vault_path.clone());
-    let graph = build_graph_pane();
-
-    root.append(&sidebar);
-    root.append(&center);
-    root.append(&graph);
+    root.append(&build_sidebar());
+    root.append(&build_center_pane(vault_path.clone()));
+    root.append(&build_graph_pane());
 
     window.set_child(Some(&root));
     window.present();
@@ -90,74 +101,37 @@ fn prompt_for_vault_folder(window: &ApplicationWindow, on_chosen: impl Fn(PathBu
 }
 
 fn build_sidebar() -> GtkBox {
-    let sidebar = GtkBox::new(Orientation::Vertical, 4);
+    let sidebar = GtkBox::new(Orientation::Vertical, 2);
     sidebar.set_width_request(220);
     sidebar.add_css_class("sidebar");
 
-    for label in ["New Chat", "Search", "Notes", "Tools", "Settings"] {
+    let title = Label::new(Some("◤ Obsidian Agent"));
+    title.set_halign(gtk::Align::Start);
+    title.add_css_class("sidebar-title");
+    sidebar.append(&title);
+
+    for label in ["+ New Chat", "Search", "Notes", "Tools", "Vault"] {
         let btn = Button::with_label(label);
-        btn.add_css_class("flat");
+        btn.add_css_class("sidebar-btn");
+        btn.set_halign(gtk::Align::Fill);
         sidebar.append(&btn);
     }
+
+    let section = Label::new(Some("SETTINGS"));
+    section.set_halign(gtk::Align::Start);
+    section.add_css_class("sidebar-section-label");
+    sidebar.append(&section);
+
+    let settings_btn = Button::with_label("Preferences");
+    settings_btn.add_css_class("sidebar-btn");
+    sidebar.append(&settings_btn);
 
     sidebar
 }
 
 fn build_center_pane(vault_path: PathBuf) -> GtkBox {
-    let center = GtkBox::new(Orientation::Vertical, 8);
+    let center = GtkBox::new(Orientation::Vertical, 0);
     center.set_hexpand(true);
+    center.add_css_class("center-pane");
 
-    let header = Label::new(Some(&format!("Vault: {}", vault_path.display())));
-    header.set_halign(gtk::Align::Start);
-
-    let messages = TextView::new();
-    messages.set_editable(false);
-    messages.set_vexpand(true);
-
-    let input_row = GtkBox::new(Orientation::Horizontal, 4);
-    let input = gtk::Entry::new();
-    input.set_hexpand(true);
-    input.set_placeholder_text(Some("Ask the agent..."));
-    let send_btn = Button::with_label("Send");
-
-    let messages_ref = Rc::new(RefCell::new(messages.clone()));
-    let input_clone = input.clone();
-    send_btn.connect_clicked(move |_| {
-        let text = input_clone.text().to_string();
-        if text.is_empty() {
-            return;
-        }
-        let buf = messages_ref.borrow().buffer();
-        let mut end = buf.end_iter();
-        buf.insert(&mut end, &format!("You: {text}\n"));
-        input_clone.set_text("");
-    });
-
-    input_row.append(&input);
-    input_row.append(&send_btn);
-
-    center.append(&header);
-    center.append(&messages);
-    center.append(&input_row);
-
-    center
-}
-
-fn build_graph_pane() -> GtkBox {
-    let graph = GtkBox::new(Orientation::Vertical, 4);
-    graph.set_width_request(400);
-
-    let label = Label::new(Some("Graph view — renders from vault links (Phase 2)"));
-    graph.append(&label);
-
-    let placeholder = gtk::DrawingArea::new();
-    placeholder.set_vexpand(true);
-    placeholder.set_draw_func(|_area, cr, width, height| {
-        cr.set_source_rgb(0.07, 0.07, 0.1);
-        let _ = cr.paint();
-        let _ = (width, height);
-    });
-    graph.append(&placeholder);
-
-    graph
-}
+    let header =
