@@ -5,6 +5,7 @@ mod state;
 use chat_view::ChatView;
 use gpui::prelude::*;
 use gpui::*;
+use gpui_platform::application;
 use graph_view::GraphView;
 use state::AppState;
 
@@ -24,7 +25,7 @@ impl Render for RootView {
 }
 
 fn main() {
-    Application::new().run(|cx: &mut App| {
+    application().run(|cx: &mut App| {
         let state = cx.new(|_| AppState::new());
 
         cx.open_window(WindowOptions::default(), |_window, cx| {
@@ -33,5 +34,7 @@ fn main() {
             cx.new(|_| RootView { chat, graph })
         })
         .unwrap();
+
+        cx.activate(true);
     });
 }
