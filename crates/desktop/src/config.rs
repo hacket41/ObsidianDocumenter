@@ -1,14 +1,14 @@
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
+pub const APP_ID: &str = "dev.obsidianagent.app";
+
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AppConfig {
     pub vault_path: Option<PathBuf>,
     pub font: Option<String>,
     pub theme: Option<String>,
 }
-
-pub const APP_ID: &str = "dev.obsidianagent.app";
 
 fn config_path() -> PathBuf {
     dirs::config_dir()
