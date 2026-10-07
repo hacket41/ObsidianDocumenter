@@ -8,8 +8,8 @@ agent_core = { path = "../agent_core" }
 llm-ollama = { path = "../llm-ollama" }
 obsidian-store = { path = "../obsidian-store" }
 
-gtk = { package = "gtk4", version = "0.9", features = ["v4_12"] }
-glib = "0.20"
+gtk = { package = "gtk4", version = "0.7" }
+glib = "0.18"
 
 tokio = { version = "1", features = ["full"] }
 anyhow = "1"

@@ -26,25 +26,17 @@ fn build_ui(app: &Application) {
         .default_height(800)
         .build();
 
-    // --- Step 1: ask for a vault folder on first launch ---
     if config.vault_path.is_none() {
         prompt_for_vault_folder(&window, move |chosen| {
             let mut cfg = AppConfig::load();
             cfg.vault_path = Some(chosen);
             let _ = cfg.save();
         });
-        // We still build the main UI below with whatever is chosen (or a
-        // default) — the dialog above saves config async on response, so
-        // for this first pass we fall back to a default path immediately
-        // and the next launch will pick up the saved choice. This keeps
-        // Phase 1 simple; wiring the dialog to block startup until a
-        // folder is picked is a Phase 2 polish item.
         config.vault_path = Some(default_vault_path());
     }
 
     let vault_path = config.vault_path.clone().unwrap_or_else(default_vault_path);
 
-    // --- 3-pane layout: sidebar | chat+content | graph ---
     let root = GtkBox::new(Orientation::Horizontal, 0);
 
     let sidebar = build_sidebar();
@@ -58,7 +50,6 @@ fn build_ui(app: &Application) {
     window.set_child(Some(&root));
     window.present();
 
-    // --- Step 3: background "write a doc every 3 min" timer ---
     let vault_for_timer = vault_path.clone();
     glib::timeout_add_seconds_local(180, move || {
         let summary = "Placeholder activity summary — real code-change tracking comes in Phase 2.";
@@ -130,7 +121,6 @@ fn build_center_pane(vault_path: PathBuf) -> GtkBox {
     input.set_placeholder_text(Some("Ask the agent..."));
     let send_btn = Button::with_label("Send");
 
-    // Step 4: chat wiring stub — real agent call comes in Phase 2
     let messages_ref = Rc::new(RefCell::new(messages.clone()));
     let input_clone = input.clone();
     send_btn.connect_clicked(move |_| {
@@ -161,8 +151,6 @@ fn build_graph_pane() -> GtkBox {
     let label = Label::new(Some("Graph view — renders from vault links (Phase 2)"));
     graph.append(&label);
 
-    // Phase 2: replace with a gtk::DrawingArea + force-directed layout,
-    // same math as before, just drawn via cairo instead of gpui's canvas.
     let placeholder = gtk::DrawingArea::new();
     placeholder.set_vexpand(true);
     placeholder.set_draw_func(|_area, cr, width, height| {
