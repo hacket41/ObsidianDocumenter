@@ -8,6 +8,8 @@ pub struct AppConfig {
     pub theme: Option<String>,
 }
 
+pub const APP_ID: &str = "dev.obsidianagent.app";
+
 fn config_path() -> PathBuf {
     dirs::config_dir()
         .unwrap_or_else(|| PathBuf::from("."))

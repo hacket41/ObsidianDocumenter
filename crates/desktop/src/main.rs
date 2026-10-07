@@ -7,8 +7,7 @@ use gtk::{glib, Application, ApplicationWindow, Box as GtkBox, Button, FileChoos
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
-
-const APP_ID: &str = "dev.obsidianagent.app";
+use config::APP_ID;
 
 fn main() -> glib::ExitCode {
     let app = Application::builder().application_id(APP_ID).build();
